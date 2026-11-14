@@ -64,11 +64,16 @@ Delivery-kit 4 requires explicit `resources.memoryMiB` from 6 through 8192 in ev
 
 ## Monitoring
 
-delivery-kit sends `game-coordinator` a scheduled review at :20 and :50 each hour, and sends every bus event (departure, gate failure, push, CI, deploy) as it happens. Both arrive over a channel into the `game-coordinator` conversation. `game-coordinator` records handling with explicit acknowledgements. At each review it does three things:
+delivery-kit sends game-coordinator reviews at :20 and :50 each hour and bus events as they happen. Both arrive over the existing channel. At every review, game-coordinator works with owners to drain the whole message backlog, including independent work:
 
-- surfaces any role's unanswered question to the user;
-- asks the owning role to close a job that has made no progress across two reviews;
-- routes failures to the owning Tech role.
+1. Inventory every registered role, including game Art, Gameplay and Tech, shared coordinators and kits, plus their verified workers' queues and ready handoffs. Read actual queued payloads and current owner evidence. Report unavailable queue or question visibility; never infer an empty backlog from an idle session.
+2. Reconcile every exact original as handled, superseded or retained. Handled and superseded require actual recipient reconciliation; transport acceptance proves delivery only. Retained items name an owner, reason and next review boundary. Do not skip ordinary independent work after prioritizing user replies and dependency unblockers.
+3. Deliver confirmed unblockers through supported native live steering and ordinary independent work through normal queues. Reconcile accepted or ambiguous deliveries before retrying. Acknowledge or remove only exact unchanged originals after confirmed reconciliation, preserving evidence for retained deliveries awaiting handling.
+4. Surface pending user decisions through their owning session's structured prompt. Preserve unanswered questions, source holds and independent work. Never answer or cancel another owner's question, interrupt or restart its turn, or treat silence as a decision. Route release failures and cross-role dependencies to the role that can resolve them.
+5. Escalate any item unhandled or repeatedly deferred across two scheduled slots with its exact ID, owner, blocker and next action. Ask owners to close finished or stalled jobs after preserving diagnostics; retain protected live resources and unresolved ownership.
+6. Finish each pass with exact counts of originals inspected, handled, superseded and retained, plus unavailable scopes. Identify each remaining item's owner, reason and next boundary; record new arrivals at safe boundaries so they are included or explicitly retained for the next pass. Claim a fully drained backlog only when no originals remain and visibility is complete.
+
+Use the existing :20/:50 reviews; add no timers or teams. Preserve handoff and activation guards when communicating with held owners.
 
 ## Sessions and handoffs
 
